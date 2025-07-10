@@ -248,5 +248,22 @@
 
         generateLokInputs();
     </script>
+
+<script>
+  // Automatisk färginställning vid sidladdning
+  window.addEventListener('DOMContentLoaded', () => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const body = document.body;
+    const toggleBtn = document.getElementById("darkModeToggle");
+
+    if (prefersDark) {
+      body.classList.add("dark-mode");
+      if (toggleBtn) toggleBtn.textContent = "Ljust läge";
+    } else {
+      if (toggleBtn) toggleBtn.textContent = "Mörkt läge";
+    }
+  });
+</script>
+
 </body>
 </html>
