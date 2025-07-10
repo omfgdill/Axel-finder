@@ -2,27 +2,44 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axelräknare</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Axel-Finder</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text: #003366;
+            --button: #0077cc;
+            --button-hover: #005fa3;
+        }
+        body.dark {
+            --bg: #1e1e1e;
+            --card-bg: #2a2a2a;
+            --text: #ffffff;
+            --button: #3399ff;
+            --button-hover: #007acc;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f6f8;
+            background-color: var(--bg);
             padding: 20px;
             margin: 0;
+            color: var(--text);
         }
-        h1 {
+        h1, h2 {
             text-align: center;
-            color: #003366;
         }
         .card {
-            background: #ffffff;
+            background: var(--card-bg);
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             margin-top: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
         label {
             display: block;
@@ -39,14 +56,14 @@
             box-sizing: border-box;
         }
         button {
-            background-color: #0077cc;
+            background-color: var(--button);
             color: white;
             font-weight: bold;
             border: none;
             margin-top: 20px;
         }
         button:hover {
-            background-color: #005fa3;
+            background-color: var(--button-hover);
         }
         .result-box {
             background-color: #e0f0ff;
@@ -58,43 +75,86 @@
             font-weight: bold;
             text-align: center;
         }
+        .lok-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .lok-inline-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+        .lok-inline-item select {
+            width: 60px;
+            padding: 6px;
+        }
+        .flex-row {
+            display: flex;
+            gap: 20px;
+        }
+        .flex-row > div {
+            flex: 1;
+        }
+        @media (max-width: 767px) {
+            .flex-row {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Axelräknare</h1>
+    <h1>Axel-Finder</h1>
     <div class="card">
+        <button onclick="toggleDarkMode()">Byt till mörkt/ljust läge</button>
+
+        <h2>Lokinställningar</h2>
         <label for="numLok">Antal lok:</label>
         <input type="number" id="numLok" value="2" min="1" onchange="generateLokInputs()">
+        <div id="lokInputs" class="lok-inline"></div>
 
-        <div id="lokInputs" class="lok-container"></div>
+        <h2>Vagninställningar</h2>
+        <div class="flex-row">
+            <div>
+                <label for="vagnTyp">Vagntyp:</label>
+                <select id="vagnTyp">
+                    <option value="8">IW (8 axlar)</option>
+                    <option value="4">Sgnss (4 axlar)</option>
+                </select>
+            </div>
+            <div>
+                <label for="numVagnar">Antal vagnar:</label>
+                <input type="number" id="numVagnar" value="22" min="0">
+            </div>
+        </div>
 
-        <label for="vagnTyp">Vagntyp:</label>
-        <select id="vagnTyp">
-            <option value="8">IW (8 axlar)</option>
-            <option value="4">Sgnss (4 axlar)</option>
-        </select>
-
-        <label for="numVagnar">Antal vagnar:</label>
-        <input type="number" id="numVagnar" value="5" min="0">
-
+        <h2>Axelsökning</h2>
         <label for="axelSok">Axelnummer att söka (separera flera med komma):</label>
         <input type="text" id="axelSok" placeholder="Ex: 5,12,23">
 
         <button onclick="beraknaAxel()">BERÄKNA</button>
-
+        <button onclick="nollstall()">Nollställ</button>
+        <div id="totalAxlar" style="margin-top:15px; font-weight:600;"></div>
         <div id="resultat" class="result-box" style="display:none;"></div>
     </div>
 
     <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark");
+        }
+
         function generateLokInputs() {
             const container = document.getElementById("lokInputs");
             const antal = parseInt(document.getElementById("numLok").value);
             container.innerHTML = "";
             for (let i = 1; i <= antal; i++) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "lok-inline-item";
                 const label = document.createElement("label");
-                label.textContent = "Lok " + i + " – antal axlar:";
+                label.textContent = "Lok " + i + ":";
                 const select = document.createElement("select");
-                select.className = "lok-select";
                 select.id = "lokAxlar" + i;
                 [4, 6].forEach(val => {
                     const option = document.createElement("option");
@@ -102,8 +162,9 @@
                     option.text = val;
                     select.appendChild(option);
                 });
-                container.appendChild(label);
-                container.appendChild(select);
+                wrapper.appendChild(label);
+                wrapper.appendChild(select);
+                container.appendChild(wrapper);
             }
         }
 
@@ -128,6 +189,8 @@
                 }
             }
 
+            document.getElementById("totalAxlar").textContent = "Totalt antal axlar: " + axelLista.length;
+
             const resRuta = document.getElementById("resultat");
             let resultatTexter = [];
             for (const axelSok of axelSokLista) {
@@ -140,6 +203,16 @@
             }
             resRuta.innerHTML = resultatTexter.join("<br>");
             resRuta.style.display = "block";
+        }
+
+        function nollstall() {
+            document.getElementById("numLok").value = 2;
+            document.getElementById("vagnTyp").value = 8;
+            document.getElementById("numVagnar").value = 22;
+            document.getElementById("axelSok").value = "";
+            document.getElementById("resultat").style.display = "none";
+            document.getElementById("totalAxlar").textContent = "";
+            generateLokInputs();
         }
 
         generateLokInputs();
