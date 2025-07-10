@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axelräknare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f6f8;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #003366;
+        }
+        .card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0077cc;
+            color: white;
+            font-weight: bold;
+            border: none;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #005fa3;
+        }
+        .result-box {
+            background-color: #e0f0ff;
+            color: #003366;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Axelräknare</h1>
+    <div class="card">
+        <label for="numLok">Antal lok:</label>
+        <input type="number" id="numLok" value="2" min="1" onchange="generateLokInputs()">
+
+        <div id="lokInputs" class="lok-container"></div>
+
+        <label for="vagnTyp">Vagntyp:</label>
+        <select id="vagnTyp">
+            <option value="8">IW (8 axlar)</option>
+            <option value="4">Sgnss (4 axlar)</option>
+        </select>
+
+        <label for="numVagnar">Antal vagnar:</label>
+        <input type="number" id="numVagnar" value="5" min="0">
+
+        
+        <label for="axelSok">Globalt axelnummer att söka (separera flera med komma):</label>
+        <input type="text" id="axelSok" placeholder="Ex: 5,12,23">
+    
+
+        <button onclick="beraknaAxel()">BERÄKNA</button>
+
+        <div id="resultat" class="result-box" style="display:none;"></div>
+    </div>
+
+    <script>
+        function generateLokInputs() {
+            const container = document.getElementById("lokInputs");
+            const antal = parseInt(document.getElementById("numLok").value);
+            container.innerHTML = "";
+            for (let i = 1; i <= antal; i++) {
+                const label = document.createElement("label");
+                label.textContent = "Lok " + i + " – antal axlar:";
+                const select = document.createElement("select");
+                select.className = "lok-select";
+                select.id = "lokAxlar" + i;
+                [4, 6].forEach(val => {
+                    const option = document.createElement("option");
+                    option.value = val;
+                    option.text = val;
+                    select.appendChild(option);
+                });
+                container.appendChild(label);
+                container.appendChild(select);
+            }
+        }
+
+        function beraknaAxel() {
+            const lokCount = parseInt(document.getElementById("numLok").value);
+            const vagnTyp = parseInt(document.getElementById("vagnTyp").value);
+            const vagnCount = parseInt(document.getElementById("numVagnar").value);
+            
+        const axelSokInput = document.getElementById("axelSok").value;
+        const axelSokLista = axelSokInput.split(",").map(a => parseInt(a.trim())).filter(a => !isNaN(a));
+    
+
+            let axelLista = [];
+            for (let i = 1; i <= lokCount; i++) {
+                const axlar = parseInt(document.getElementById("lokAxlar" + i).value);
+                for (let j = 1; j <= axlar; j++) {
+                    axelLista.push({ typ: "Lok", nr: i, axel: j });
+                }
+            }
+
+            for (let i = 1; i <= vagnCount; i++) {
+                for (let j = 1; j <= vagnTyp; j++) {
+                    axelLista.push({ typ: "Vagn", nr: i, axel: j });
+                }
+            }
+
+            const resRuta = document.getElementById("resultat");
+            let resultatTexter = [];
+            for (const axelSok of axelSokLista) {
+                if (axelSok < 1 || axelSok > axelLista.length) {
+                    resultatTexter.push("Axel " + axelSok + " är utanför räckvidd (max: " + axelLista.length + ")");
+                } else {
+                    const axel = axelLista[axelSok - 1];
+                    resultatTexter.push("Axel " + axelSok + " tillhör " + axel.typ + " " + axel.nr + ", axel " + axel.axel);
+                }
+            }
+            resRuta.innerHTML = resultatTexter.join("<br>");
+            resRuta.style.display = "block";
+        }
+
+        // Initiera formuläret direkt
+        generateLokInputs();
+    </script>
+</body>
+</html>
