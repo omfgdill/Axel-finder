@@ -77,10 +77,8 @@
         <label for="numVagnar">Antal vagnar:</label>
         <input type="number" id="numVagnar" value="5" min="0">
 
-        
-        <label for="axelSok">Globalt axelnummer att söka (separera flera med komma):</label>
+        <label for="axelSok">Axelnummer att söka (separera flera med komma):</label>
         <input type="text" id="axelSok" placeholder="Ex: 5,12,23">
-    
 
         <button onclick="beraknaAxel()">BERÄKNA</button>
 
@@ -113,10 +111,8 @@
             const lokCount = parseInt(document.getElementById("numLok").value);
             const vagnTyp = parseInt(document.getElementById("vagnTyp").value);
             const vagnCount = parseInt(document.getElementById("numVagnar").value);
-            
-        const axelSokInput = document.getElementById("axelSok").value;
-        const axelSokLista = axelSokInput.split(",").map(a => parseInt(a.trim())).filter(a => !isNaN(a));
-    
+            const axelSokInput = document.getElementById("axelSok").value;
+            const axelSokLista = axelSokInput.split(",").map(a => parseInt(a.trim())).filter(a => !isNaN(a));
 
             let axelLista = [];
             for (let i = 1; i <= lokCount; i++) {
@@ -146,7 +142,6 @@
             resRuta.style.display = "block";
         }
 
-        // Initiera formuläret direkt
         generateLokInputs();
     </script>
 </body>
