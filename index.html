@@ -1,17 +1,17 @@
 
 <!DOCTYPE html>
+
 <html lang="sv">
 <head>
-    <link rel="icon" type="image/png" sizes="32x32" href="lokikon_32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="lokikon_180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="lokikon_192x192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>Axelposition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
+<link href="lokikon_32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="lokikon_180x180.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="lokikon_192x192.png" rel="icon" sizes="192x192" type="image/png"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Axelposition</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<style>
         :root {
             --bg: #f4f6f8;
             --card-bg: #ffffff;
@@ -116,8 +116,27 @@
   .button-row button { flex: 1; }
 }
 
-</style>
 
+
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  border-color: #444;
+}
+body.dark-mode button {
+  background-color: #3399ff;
+  color: white;
+}
+body.dark-mode button:hover {
+  background-color: #1a75d1;
+}
+</style>
 <style>
   #helpButton {
     position: fixed;
@@ -165,46 +184,40 @@
     padding: 0;
   }
 </style>
-</head>
-
+</meta></head>
 <body>
-    <h1>Axelposition</h1>
-    <div class="card">
-        <button onclick="toggleDarkMode()">Byt till mörkt/ljust läge</button>
-
-        <h2>Lokinställningar</h2>
-        <label for="numLok">Antal lok:</label>
-        <input type="number" id="numLok" value="2" min="1" onchange="generateLokInputs()" autofocus inputmode="numeric">
-        <div id="lokInputs" class="lok-inline"></div>
-
-        <h2>Vagninställningar</h2>
-        <div class="flex-row">
-            <div>
-                <label for="vagnTyp">Vagntyp:</label>
-                <select id="vagnTyp">
-                    <option value="8">IW (8 axlar)</option>
-                    <option value="4">Sgnss (4 axlar)</option>
-                </select>
-            </div>
-            <div>
-                <label for="numVagnar">Antal vagnar:</label>
-                <input type="number" id="numVagnar" value="22" min="0" inputmode="numeric">
-            </div>
-        </div>
-
-        <h2>Axelsökning</h2>
-        <label for="axelSok">Axelnummer att söka (separera flera med komma):</label>
-        <input type="text" id="axelSok" placeholder="Ex: 5,12,23" inputmode="numeric">
-
-        <div class="button-row">
+<h1>Axelposition</h1>
+<div class="card">
+<button onclick="toggleDarkMode()">Byt till mörkt/ljust läge</button>
+<h2>Lokinställningar</h2>
+<label for="numLok">Antal lok:</label>
+<input autofocus="" id="numLok" inputmode="numeric" min="1" onchange="generateLokInputs()" type="number" value="2"/>
+<div class="lok-inline" id="lokInputs"></div>
+<h2>Vagninställningar</h2>
+<div class="flex-row">
+<div>
+<label for="vagnTyp">Vagntyp:</label>
+<select id="vagnTyp">
+<option value="8">IW (8 axlar)</option>
+<option value="4">Sgnss (4 axlar)</option>
+</select>
+</div>
+<div>
+<label for="numVagnar">Antal vagnar:</label>
+<input id="numVagnar" inputmode="numeric" min="0" type="number" value="22"/>
+</div>
+</div>
+<h2>Axelsökning</h2>
+<label for="axelSok">Axelnummer att söka (separera flera med komma):</label>
+<input id="axelSok" inputmode="numeric" placeholder="Ex: 5,12,23" type="text"/>
+<div class="button-row">
 <button onclick="beraknaAxel()">Hitta</button>
 <button onclick="nollstall()">Nollställ</button>
 </div>
-        <div id="totalAxlar" style="margin-top:15px; font-weight:600;"></div>
-        <div id="resultat" class="result-box" style="display:none;"><ul id="resultList" style="list-style:none; padding-left:0;"></ul></div>
-    </div>
-
-    <script>
+<div id="totalAxlar" style="margin-top:15px; font-weight:600;"></div>
+<div class="result-box" id="resultat" style="display:none;"><ul id="resultList" style="list-style:none; padding-left:0;"></ul></div>
+</div>
+<script>
         function toggleDarkMode() {
             document.body.classList.toggle("dark");
         }
@@ -297,55 +310,14 @@
 
         generateLokInputs();
     </script>
-
-<script>
-  // Automatisk färginställning vid sidladdning
-  
-window.addEventListener('DOMContentLoaded', () => {
-  const body = document.body;
-  const toggleBtn = document.getElementById("darkModeToggle");
-  const savedMode = localStorage.getItem("darkMode");
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-  let darkMode = false;
-
-  if (savedMode === "true") {
-    darkMode = true;
-  } else if (savedMode === "false") {
-    darkMode = false;
-  } else {
-    darkMode = prefersDark;
-  }
-
-  if (darkMode) {
-    body.classList.add("dark-mode");
-    if (toggleBtn) toggleBtn.textContent = "Ljust läge";
-  } else {
-    body.classList.remove("dark-mode");
-    if (toggleBtn) toggleBtn.textContent = "Mörkt läge";
-  }
-
-  if (toggleBtn) {
-    toggleBtn.addEventListener("click", () => {
-      const isDark = body.classList.toggle("dark-mode");
-      localStorage.setItem("darkMode", isDark);
-      toggleBtn.textContent = isDark ? "Ljust läge" : "Mörkt läge";
-    });
-  }
-});
-
-</script>
-
-
 <button id="helpButton">?</button>
 <div id="helpPopup">
-  <p><strong>Så fungerar Axelposition</strong></p>
-  <p>1. Välj antal lok och hur många axlar varje lok har</p>
-  <p>2. Välj antal vagnar och vagnstyp (IW = 8 axlar, Sgnss = 4 axlar)</p>
-  <p>3. Skriv in axelnummer för att se vilken vagn och plats de tillhör</p>
-  <button id="closeHelp">Stäng</button>
+<p><strong>Så fungerar Axelposition</strong></p>
+<p>1. Välj antal lok och hur många axlar varje lok har</p>
+<p>2. Välj antal vagnar och vagnstyp (IW = 8 axlar, Sgnss = 4 axlar)</p>
+<p>3. Skriv in axelnummer för att se vilken vagn och plats de tillhör</p>
+<button id="closeHelp">Stäng</button>
 </div>
-
 <script>
   const helpBtn = document.getElementById('helpButton');
   const helpBox = document.getElementById('helpPopup');
@@ -358,7 +330,25 @@ window.addEventListener('DOMContentLoaded', () => {
   closeHelp.addEventListener('click', () => {
     helpBox.style.display = 'none';
   });
+</script><script>
+document.addEventListener("DOMContentLoaded", function() {
+  const toggleBtn = document.getElementById("darkModeToggle");
+  const body = document.body;
+
+  if (localStorage.getItem("darkMode") === "true") {
+    body.classList.add("dark-mode");
+    toggleBtn.textContent = "Ljust läge";
+  } else {
+    body.classList.remove("dark-mode");
+    toggleBtn.textContent = "Mörkt läge";
+  }
+
+  toggleBtn.addEventListener("click", () => {
+    const isDark = body.classList.toggle("dark-mode");
+    localStorage.setItem("darkMode", isDark);
+    toggleBtn.textContent = isDark ? "Ljust läge" : "Mörkt läge";
+  });
+});
 </script>
 </body>
-
 </html>
