@@ -300,18 +300,41 @@
 
 <script>
   // Automatisk färginställning vid sidladdning
-  window.addEventListener('DOMContentLoaded', () => {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const body = document.body;
-    const toggleBtn = document.getElementById("darkModeToggle");
+  
+// Initiera färgtema vid sidladdning
+window.addEventListener('DOMContentLoaded', () => {
+  const body = document.body;
+  const toggleBtn = document.getElementById("darkModeToggle");
+  const savedMode = localStorage.getItem("darkMode");
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    if (prefersDark) {
-      body.classList.add("dark-mode");
-      if (toggleBtn) toggleBtn.textContent = "Ljust läge";
-    } else {
-      if (toggleBtn) toggleBtn.textContent = "Mörkt läge";
-    }
-  });
+  let darkMode = false;
+
+  if (savedMode === "true") {
+    darkMode = true;
+  } else if (savedMode === "false") {
+    darkMode = false;
+  } else {
+    darkMode = prefersDark;
+  }
+
+  if (darkMode) {
+    body.classList.add("dark-mode");
+    if (toggleBtn) toggleBtn.textContent = "Ljust läge";
+  } else {
+    body.classList.remove("dark-mode");
+    if (toggleBtn) toggleBtn.textContent = "Mörkt läge";
+  }
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      const isDark = body.classList.toggle("dark-mode");
+      localStorage.setItem("darkMode", isDark);
+      toggleBtn.textContent = isDark ? "Ljust läge" : "Mörkt läge";
+    });
+  }
+});
+
 </script>
 
 
