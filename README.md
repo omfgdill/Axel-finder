@@ -21,7 +21,7 @@
 
 ## 🌐 Direktlänk till webbappen
 
-👉 [Öppna Axelposition](https://omfgdill.github.io/axelposition/)
+👉 [Öppna Axelposition](https://omfgdill.github.io/axelposition-app/)
 
 ## 📁 Kör lokalt (frivilligt)
 
