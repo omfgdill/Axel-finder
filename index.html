@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axelposition</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+  <style>
+
+    /* Toggle Switch */
+    .theme-switch {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .theme-switch .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: background-color 0.4s;
+      border-radius: 34px;
+    }
+    .theme-switch .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: transform 0.4s;
+      border-radius: 50%;
+    }
+    .theme-switch input:checked + .slider {
+      background-color: #2196F3;
+    }
+    .theme-switch input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    :root {
+      --bg: #f4f6f8;
+      --text: #1a1a1a;
+      --card-bg: #ffffff;
+      --button-bg: #2563eb;
+      --button-text: #ffffff;
+    }
+    body.dark {
+      --bg: #1e1e1e;
+      --text: #ffffff;
+      --card-bg: #2a2a2a;
+      --button-bg: #3b82f6;
+      --button-text: #ffffff;
+    }
+    body {
+      margin: 0; padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Roboto', sans-serif;
+    }
+    .container {
+      max-width: 420px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    .content-box {
+      background-color: var(--card-bg);
+      color: var(--text);
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .content-box.active {
+      display: block;
+    }
+    h2 { margin-top: 0; }
+    button {
+      background-color: var(--button-bg);
+      color: var(--button-text);
+      border: none; border-radius: 8px;
+      padding: 0.75rem 1.5rem; font-size: 1rem;
+      cursor: pointer; transition: background-color 0.2s, transform 0.2s;
+      margin-top: 1rem;
+    }
+    button:hover { transform: translateY(-2px); }
+    input, select {
+      width: 100%; padding: 0.5rem; font-size: 1rem;
+      margin-top: 0.5rem; border-radius: 6px;
+      border: 1px solid #ccc; box-sizing: border-box;
+    }
+    .button-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .green { color: green; font-weight: bold; }
+    .red   { color: red;   font-weight: bold; }
+    .theme-btn { position: fixed; top: 10px; right: 10px; background: none; font-size: 1.5rem; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  
+    <label class="theme-switch">
+      <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+      <span class="slider"></span>
+    </label>
+
+  <div class="container">
+    <div id="step0" class="content-box active">
+      <h2>Välkommen till Axelposition</h2>
+      <p>Detta verktyg hjälper dig att söka reda på en specifik axels position i ett tågsätt och visar vagn/lok och plats.</p>
+      <button onclick="goToStep(1)">Start</button>
+    </div>
+    <div id="step1" class="content-box">
+      <h2>Välj tågsammansättning</h2>
+      <button onclick="loadStandard(2,4,22,'IW')">2 Lok + 22 IW</button>
+      <button onclick="loadStandard(1,4,11,'IW')">1 Lok + 11 IW</button>
+      <button onclick="manualMode = true; goToStep(2)">Manuell inmatning</button>
+    </div>
+    <div id="step2" class="content-box">
+      <h2>Antal lok</h2>
+      <select id="numLok"><option>1</option><option selected>2</option><option>3</option></select>
+      <div class="button-row">
+        <button onclick="goToStep(1)">Tillbaka</button>
+        <button onclick="goToStep(3)">Nästa</button>
+      </div>
+    </div>
+    <div id="step3" class="content-box">
+      <h2>Axlar per lok</h2>
+      <div id="lokAxlar"></div>
+      <div class="button-row">
+        <button onclick="goToStep(2)">Tillbaka</button>
+        <button onclick="goToStep(4)">Nästa</button>
+      </div>
+    </div>
+    <div id="step4" class="content-box">
+      <h2>Antal vagnar</h2>
+      <input type="number" id="numVagnar" value="22" min="1">
+      <div class="button-row">
+        <button onclick="goToStep(3)">Tillbaka</button>
+        <button onclick="goToStep(5)">Nästa</button>
+      </div>
+    </div>
+    <div id="step5" class="content-box">
+      <h2>Vagnstyp</h2>
+      <select id="vagnTyp"><option value="8">IW (8 axlar)</option><option value="4">Sgnss (4 axlar)</option></select>
+      <div class="button-row">
+        <button onclick="goToStep(4)">Tillbaka</button>
+        <button onclick="goToStep(6)">Nästa</button>
+      </div>
+    </div>
+    <div id="step6" class="content-box">
+      <h2>Ange axel/axlar</h2>
+      <input id="axelSok" placeholder="1 - X">
+      <div class="button-row">
+        <button onclick="goToStep(5)">Tillbaka</button>
+        <button onclick="showResult()">Hitta</button>
+      </div>
+    </div>
+    <div id="step7" class="content-box">
+      <h2>Resultat</h2>
+      <div id="result"></div>
+      <div class="button-row">
+        <button onclick="goToStep(6)">Tillbaka</button>
+        <button onclick="goToStep(0)">Börja om</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let axeldata=[];
+let manualMode = false;
+    function toggleTheme(){
+      document.body.classList.toggle('dark');
+      localStorage.theme=document.body.classList.contains('dark')?'dark':'light';
+    }
+    window.onload = ()=>{
+      // Initialize theme toggle switch state
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.checked = document.body.classList.contains('dark');
+      }
+    
+      if(localStorage.theme==='dark') document.body.classList.add('dark');
+      goToStep(0);
+    };
+    function goToStep(n){
+      document.querySelectorAll('.content-box').forEach(c=>c.classList.remove('active'));
+      document.getElementById('step'+n).classList.add('active');
+      if(n===3) buildLokAxlar();
+      if(n===6) updateAxelPlaceholder();
+    }
+    function loadStandard(l,ax,v,typ){
+      manualMode = false;
+      axeldata=[];
+      for(let i=1;i<=l;i++)for(let j=1;j<=ax;j++)axeldata.push({typ:'Lok',nr:i,axel:j});
+      const perV = typ==='IW'?8:4;
+      for(let i=1;i<=v;i++)for(let j=1;j<=perV;j++)axeldata.push({typ:'Vagn',nr:i,axel:j});
+      goToStep(6);
+    }
+    function buildLokAxlar(){
+      axeldata=[];
+      const l = +document.getElementById('numLok').value;
+      const cont = document.getElementById('lokAxlar');
+      cont.innerHTML='';
+      for(let i=1;i<=l;i++){
+        const lbl=document.createElement('label'); lbl.innerText='Lok '+i+' axlar:';
+        const inp=document.createElement('input'); inp.type='number'; inp.id='lok'+i; inp.value=4; inp.min=1;
+        cont.append(lbl,inp);
+      }
+    }
+    function updateAxelPlaceholder(){
+      if(manualMode){ axeldata = []; }
+      if(axeldata.length===0){
+        const l = +document.getElementById('numLok').value;
+        for(let i=1;i<=l;i++){
+          const ax = +document.getElementById('lok'+i).value;
+          for(let j=1;j<=ax;j++)axeldata.push({typ:'Lok',nr:i,axel:j});
+        }
+        const v = +document.getElementById('numVagnar').value;
+        const t = +document.getElementById('vagnTyp').value;
+        for(let i=1;i<=v;i++)for(let j=1;j<=t;j++)axeldata.push({typ:'Vagn',nr:i,axel:j});
+      }
+      document.getElementById('axelSok').placeholder='1 - '+axeldata.length+' (Ex: 5,12,33)';
+    }
+    function showResult(){
+      const res=document.getElementById('result');res.innerHTML='';
+      const nums=document.getElementById('axelSok').value.split(',').map(n=>+n.trim());
+      nums.forEach(n=>{
+        if(n>=1&&n<=axeldata.length){
+          const a=axeldata[n-1];
+          res.innerHTML+=`<p>Axel <span class="green">${n}</span> tillhör ${a.typ} <span class="green">${a.nr}</span>, axel <span class="green">${a.axel}</span></p>`;
+        } else {
+          res.innerHTML+=`<p>Axel <span class="red">${n}</span> finns ej i tåget. Högsta axelnummer är <span class="red">${axeldata.length}</span>.</p>`;
+        }
+      });
+      goToStep(7);
+    }
+  </script>
+</body>
+</html>
